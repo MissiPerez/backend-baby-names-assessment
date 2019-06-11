@@ -41,12 +41,41 @@ Suggested milestones for incremental development:
 
 def extract_names(filename):
     """
-    Given a file name for baby.html, returns a list starting with the year string
+    Given a file name for baby.html, returns a list starting with the year string 
     followed by the name-rank strings in alphabetical order.
     ['2006', 'Aaliyah 91', Aaron 57', 'Abagail 895', ' ...]
     """
-    # +++your code here+++
-    return
+    names = []
+    girls_names = []
+    boys_names = []
+    with open(filename,'r') as filedata:
+        text = filedata.read()
+        year_match = re.search(r'Popularity\sin\s(\d\d\d\d)', text)
+        name_match = re.finditer(r'<td>(\d+)</td><td>(\w+)</td><td>(\w+)</td>', text)
+        for name in name_match:
+            #temp_name = name.group(1, 2, 3)
+            girls_names.append(name.group(3,1))
+            boys_names.append(name.group(2,1))
+        # print girls_names, boys_names
+        if not year_match:
+            print("Couldn't find the year")
+        year = year_match.group(1)
+        # name = name_match.group(1, 2, 3)
+        names.append(year)
+        full_list = boys_names + girls_names
+        sorted_list = sorted(full_list, key=lambda x: x[0])
+
+        str_list=[]
+        for tuple_temp in sorted_list:
+            str_list.append(str(tuple_temp[0]+ ' ' + str(tuple_temp[1])))
+
+        formatted_list = '\n'.join(str_list) + '\n'
+
+        return formatted_list
+        # print str_list
+        # print formatted_list
+        # sorted_girls = sorted(girls_names, key=lambda x:[1])
+        # sorted_boys = sorted(boys_names, key=lambda x:[1])
 
 
 def create_parser():
@@ -59,7 +88,6 @@ def create_parser():
     parser.add_argument('files', help='filename(s) to parse', nargs='+')
     return parser
 
-
 def main():
     parser = create_parser()
     args = parser.parse_args()
@@ -69,9 +97,25 @@ def main():
         sys.exit(1)
 
     file_list = args.files
+    
 
     # option flag
     create_summary = args.summaryfile
+    if create_summary:
+        for i in file_list:
+            with open(i+'.summary', 'w+') as f:
+                f.write(extract_names(i))
+    else:
+        for i in file_list:
+            print extract_names(i)
+
+
+    # print create_summary
+    extract_names("baby1990.html")
+
+    #with open('foo.html.summary', 'w+') as f:
+        #f.write(extract_names(filename))
+
 
     # +++your code here+++
     # For each filename, get the names, then either print the text output
